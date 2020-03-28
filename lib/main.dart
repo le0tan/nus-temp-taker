@@ -72,12 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
         : _selectedTimeOfTheDay = PM;
   }
 
-  Future<String> _getCredentials() async {
-    var user = await _storage.read(key: 'username');
-    var pass = await _storage.read(key: 'password');
-    return "username: $user; password: $pass;";
-  }
-
   void _setSelectedTimeOfTheDay(int val) {
     setState(() {
       _selectedTimeOfTheDay = val;
@@ -149,10 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
               RaisedButton(
                 child: Text('View photos'),
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GalleryPage()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => GalleryPage()));
                 },
               ),
               RaisedButton(
@@ -240,6 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Text('Reset Credentials'),
                       onPressed: () async {
                         await _storage.deleteAll();
+                        _showLoginPrompt();
                       },
                     )
                   ],
@@ -249,11 +242,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showLoginPrompt,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

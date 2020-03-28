@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 
 class GalleryPage extends StatefulWidget {
   @override
@@ -34,19 +35,20 @@ class _GalleryPageState extends State<GalleryPage> {
           if (snapshot.hasData) {
             var dir = snapshot.data;
             var fileList = dir.listSync();
+            var validFiles = fileList.where((val) => val is File).toList();
             return ListView.builder(
-              itemCount: fileList.length,
+              itemCount: validFiles.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: ListTile(
-                    leading: Image.file(File(fileList[index].path)),
-                    title: Text(fileList[index].toString()),
+                    leading: Image.file(File(validFiles[index].path)),
+                    title: Text(validFiles[index].toString()),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DisplayPictureScreen(
-                              imagePath: fileList[index].path),
+                              imagePath: validFiles[index].path),
                         ),
                       );
                     },
@@ -75,7 +77,10 @@ class DisplayPictureScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Display the Picture')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: Container(
+          child: PhotoView(
+        imageProvider: FileImage(File(imagePath)),
+      )),
     );
   }
 }

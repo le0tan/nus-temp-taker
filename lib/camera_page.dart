@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
-import 'package:gallery_saver/gallery_saver.dart';
-import 'dart:io';
 
 class CameraPage extends StatefulWidget {
   final CameraDescription camera;
