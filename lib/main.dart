@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:temp_taker/camera_page.dart';
 import 'package:temp_taker/gallery_page.dart';
 import 'package:temp_taker/login_page.dart';
+import 'package:temp_taker/record_page.dart';
 import 'package:temp_taker/uploader.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -128,6 +129,16 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  Future<TempDeclarer> getDeclarer() async {
+    if (this._declarer == null) {
+      var username = await _storage.read(key: 'username');
+      var password = await _storage.read(key: 'password');
+      this._declarer = new TempDeclarer(username, password);
+    } else {
+      return this._declarer;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,108 +148,117 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              RaisedButton(
-                child: Text('View photos'),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => GalleryPage()));
-                },
-              ),
-              RaisedButton(
-                child: Text('Take photo'),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CameraPage(cameras.first)));
-                },
-              ),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Temperature'),
-                      controller: _tempController,
-                      validator: (value) {
-                        double num = double.parse(value);
-                        if (num >= 40.0 || num <= 35.0) {
-                          return 'Invalid range of temperature';
-                        }
-                        return null;
-                      },
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text('AM/PM'),
-                        Radio(
-                          value: 0,
-                          groupValue: _selectedTimeOfTheDay,
-                          onChanged: (val) => _setSelectedTimeOfTheDay(val),
-                        ),
-                        Text('AM'),
-                        Radio(
-                          value: 1,
-                          groupValue: _selectedTimeOfTheDay,
-                          onChanged: (val) => _setSelectedTimeOfTheDay(val),
-                        ),
-                        Text('PM')
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text('Do you have any symptoms?'),
-                        Radio(
-                          value: 0,
-                          groupValue: _selectedSymptom,
-                          onChanged: (val) => _setSelectedSymptom(val),
-                        ),
-                        Text('No'),
-                        Radio(
-                          value: 1,
-                          groupValue: _selectedSymptom,
-                          onChanged: (val) => _setSelectedSymptom(val),
-                        ),
-                        Text('Yes')
-                      ],
-                    ),
-                    RaisedButton(
-                      child: Text('Submit'),
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          var username = await _storage.read(key: 'username');
-                          var password = await _storage.read(key: 'password');
-                          if (this._declarer == null)
-                            this._declarer =
-                                new TempDeclarer(username, password);
-                          var res = await _declarer.submitTemp(
-                              double.parse(_tempController.text),
-                              freq: _selectedTimeOfTheDay == AM ? 'A' : 'P',
-                              symptom: _selectedSymptom == hasSymptom);
-                          if (res != null) {
-                            _showSuccessPrompt(res);
-                          } else {
-                            _showLoginPrompt(
-                                reason: 'Failed to submit data. '
-                                    'You may check your connection, restart the app or tap "Login" to reset credentials.');
-                          }
-                        }
-                      },
-                    ),
-                    RaisedButton(
-                      child: Text('Reset Credentials'),
-                      onPressed: () async {
-                        await _storage.deleteAll();
-                        _showLoginPrompt();
-                      },
-                    )
-                  ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                RaisedButton(
+                  child: Text('View photos'),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => GalleryPage()));
+                  },
                 ),
-              )
-            ],
+                RaisedButton(
+                  child: Text('Take photo'),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CameraPage(cameras.first)));
+                  },
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Temperature'),
+                        controller: _tempController,
+                        validator: (value) {
+                          double num = double.parse(value);
+                          if (num >= 40.0 || num <= 35.0) {
+                            return 'Invalid range of temperature';
+                          }
+                          return null;
+                        },
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text('AM/PM'),
+                          Radio(
+                            value: 0,
+                            groupValue: _selectedTimeOfTheDay,
+                            onChanged: (val) => _setSelectedTimeOfTheDay(val),
+                          ),
+                          Text('AM'),
+                          Radio(
+                            value: 1,
+                            groupValue: _selectedTimeOfTheDay,
+                            onChanged: (val) => _setSelectedTimeOfTheDay(val),
+                          ),
+                          Text('PM')
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text('Do you have any symptoms?'),
+                          Radio(
+                            value: 0,
+                            groupValue: _selectedSymptom,
+                            onChanged: (val) => _setSelectedSymptom(val),
+                          ),
+                          Text('No'),
+                          Radio(
+                            value: 1,
+                            groupValue: _selectedSymptom,
+                            onChanged: (val) => _setSelectedSymptom(val),
+                          ),
+                          Text('Yes')
+                        ],
+                      ),
+                      RaisedButton(
+                        child: Text('Submit'),
+                        onPressed: () async {
+                          if (_formKey.currentState.validate()) {
+                            var declarer = await getDeclarer();
+                            var res = await declarer.submitTemp(
+                                double.parse(_tempController.text),
+                                freq: _selectedTimeOfTheDay == AM ? 'A' : 'P',
+                                symptom: _selectedSymptom == hasSymptom);
+                            if (res != null) {
+                              _showSuccessPrompt(res);
+                            } else {
+                              _showLoginPrompt(
+                                  reason: 'Failed to submit data. '
+                                      'You may check your connection, restart the app or tap "Login" to reset credentials.');
+                            }
+                          }
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Past Records'),
+                        onPressed: () async {
+                          var declarer = await getDeclarer();
+                          var html = await declarer.getRecords();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RecordPage(html)));
+                        },
+                      ),
+                      RaisedButton(
+                        child: Text('Reset Credentials'),
+                        onPressed: () async {
+                          await _storage.deleteAll();
+                          _showLoginPrompt();
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
