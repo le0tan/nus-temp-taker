@@ -41,24 +41,23 @@ class TempDeclarer {
     }
   }
 
-  Future<bool> _submitTemp(double temp, String date, String freq, bool symptom, String cookie) async {
-    var uri = Uri(
-      scheme: 'https',
-      host: 'myaces.nus.edu.sg',
-      path: '/htd/htd'
-    );
+  Future<bool> _submitTemp(double temp, String date, String freq, bool symptom,
+      String cookie) async {
+    var uri = Uri(scheme: 'https', host: 'myaces.nus.edu.sg', path: '/htd/htd');
     var data = {
-        "actionName": "dlytemperature",
-        "tempDeclOn": date,
-        "declFrequency": freq,
-        "temperature": temp,
-        "symptomsFlag": symptom ? 'Y' : 'N'
+      "actionName": "dlytemperature",
+      "tempDeclOn": date,
+      "declFrequency": freq,
+      "temperature": temp,
+      "symptomsFlag": symptom ? 'Y' : 'N'
     };
-    var response = await client.post(uri.toString(), data, headers: {'Cookie': "JSESSIONID=$cookie;"});
+    var response = await client
+        .post(uri.toString(), data, headers: {'Cookie': "JSESSIONID=$cookie;"});
     return response.statusCode == 200;
   }
 
-  Future<Map<String, dynamic>> submitTemp(double temp, {String date, String freq, bool symptom}) async {
+  Future<Map<String, dynamic>> submitTemp(double temp,
+      {String date, String freq, bool symptom}) async {
     try {
       if (this._cookie == null) {
         this._cookie = await _getCookie();

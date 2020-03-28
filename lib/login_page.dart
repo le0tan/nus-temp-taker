@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                                       key: 'password',
                                       value: _passwordController.text)
                                   .then((val) {
-                                    Navigator.of(context).pop();
+                                Navigator.of(context).pop();
                               });
                             });
                           }

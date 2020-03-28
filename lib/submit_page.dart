@@ -13,10 +13,14 @@ class _SubmitPageState extends State<SubmitPage> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: AppBar(title: Text('Temp Submit'),),
+      appBar: AppBar(
+        title: Text('Temp Submit'),
+      ),
       body: Builder(
         builder: (BuildContext context) {
-          return Center(child: Text('haha'),);
+          return Center(
+            child: Text('haha'),
+          );
         },
       ),
     );
