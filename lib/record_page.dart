@@ -27,12 +27,16 @@ class _RecordPageState extends State<RecordPage> {
             itemBuilder: (BuildContext context, int index) {
               var rawText =
                   rows[index].text.replaceAll('\t', '').replaceAll(' ', '');
+              print(rawText.replaceAll('\n', '*'));
               return Card(
-                child: Text(rawText
-                    .split('\n')
-                    .where((val) => val.isNotEmpty)
-                    .toList()
-                    .toString()),
+                child: Text(
+                  rawText
+                      .split('\n')
+                      .where((val) => val.isNotEmpty && val != ',')
+                      .toList()
+                      .toString(),
+                  style: TextStyle(fontSize: 17.0),
+                ),
               );
             },
           );
