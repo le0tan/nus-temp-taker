@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:temp_taker/camera_page.dart';
-import 'package:temp_taker/gallery_page.dart';
-import 'package:temp_taker/login_page.dart';
-import 'package:temp_taker/record_page.dart';
-import 'package:temp_taker/uploader.dart';
+import 'package:nus_temp_declarer/camera_page.dart';
+import 'package:nus_temp_declarer/gallery_page.dart';
+import 'package:nus_temp_declarer/login_page.dart';
+import 'package:nus_temp_declarer/record_page.dart';
+import 'package:nus_temp_declarer/uploader.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -255,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         "Submit",
                                         style: TextStyle(
                                             fontFamily: "Bebas Neue",
-                                            fontSize: 20.0,
+                                            fontSize: 16.0,
                                             fontWeight: FontWeight.bold),
                                       ),
                                       shape: new CircleBorder(),

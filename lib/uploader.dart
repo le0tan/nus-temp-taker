@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:intl/intl.dart';
-import 'package:temp_taker/http_client.dart';
+import 'package:nus_temp_declarer/http_client.dart';
 import 'exception.dart';
 
 class TempDeclarer {
