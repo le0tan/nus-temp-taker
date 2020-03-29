@@ -17,14 +17,26 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    //TODO: implement build
+ 
     return Scaffold(
+      
       appBar: AppBar(
         title: Text('Login Page'),
       ),
-      body: Builder(
+      //backgroundColor: Colors.transparent,
+      
+      body:    
+      Builder(
         builder: (BuildContext context) {
-          return Padding(
+          return 
+      //     Stack(
+      // children: <Widget>[
+      //   Image.asset("assets/temp_bg.jpeg",
+      //   height: MediaQuery.of(context).size.height,
+      //       width: MediaQuery.of(context).size.width,
+      //       fit: BoxFit.cover),
+            Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Form(
@@ -54,8 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: RaisedButton(
-                        onPressed: () {
+                      child: NiceButton("Sumbit", () {
                           if (_formKey.currentState.validate()) {
                             _storage
                                 .write(
@@ -71,18 +82,47 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             });
                           }
-                          ;
+                          
                         },
-                        child: Text('Submit'),
+                       
                       ),
                     )
                   ],
                 ),
               ),
             ),
-          );
+          )
+          //]);
         },
       ),
+    );
+  }
+}
+
+var _signinTextStyle =
+    (BuildContext context) => Theme.of(context).textTheme.subhead;
+
+class NiceButton extends StatelessWidget {
+  final String name;
+  final Function onPressed;
+  NiceButton(this.name, this.onPressed);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      child: Text(
+        name,
+        style: _signinTextStyle(context),
+        textAlign: TextAlign.center,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(
+          color: Colors.blueGrey,
+          width: 3.0,
+        )
+      ),
+      // button color
+      onPressed: onPressed,
     );
   }
 }
