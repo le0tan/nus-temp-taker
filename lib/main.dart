@@ -105,7 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  void _showLoginPrompt({String reason = "You will be directed to login in page. The previous credential will be cleared."}) {
+  void _showLoginPrompt(
+      {String reason =
+          "You will be directed to login in page. The previous credential will be cleared."}) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -130,14 +132,19 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  Future<TempDeclarer> getDeclarer() async {
+  Future<bool> _checkCredentials() async {
+    var username = await _storage.read(key: 'username');
+    var password = await _storage.read(key: 'password');
+    return username != null && password != null;
+  }
+
+  Future<TempDeclarer> _getDeclarer() async {
     if (this._declarer == null) {
       var username = await _storage.read(key: 'username');
       var password = await _storage.read(key: 'password');
       this._declarer = new TempDeclarer(username, password);
-    } else {
-      return this._declarer;
     }
+    return this._declarer;
   }
 
   @override
@@ -153,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                
                 Form(
                   key: _formKey,
                   child: Column(
@@ -162,6 +168,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         decoration: InputDecoration(labelText: 'Temperature'),
                         controller: _tempController,
                         validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please input your temperature.';
+                          }
                           double num = double.parse(value);
                           if (num >= 40.0 || num <= 35.0) {
                             return 'Invalid range of temperature';
@@ -252,7 +261,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       shape: new CircleBorder(),
                                       onPressed: () async {
                                         if (_formKey.currentState.validate()) {
-                                          var declarer = await getDeclarer();
+                                          if (!await _checkCredentials()) {
+                                            _showLoginPrompt(
+                                                reason:
+                                                    "No credential is provided. Please login.");
+                                            return;
+                                          }
+                                          var declarer = await _getDeclarer();
                                           var res = await declarer.submitTemp(
                                               double.parse(
                                                   _tempController.text),
@@ -285,27 +300,40 @@ class _MyHomePageState extends State<MyHomePage> {
                                             CameraPage(cameras.first)));
                               },
                             ),
-                          
                           ],
                         ),
                       ),
                       Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              NiceButton("View Photos",  () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => GalleryPage()));
-                  },),
-                       NiceButton("View Records", () async {
-                          var declarer = await getDeclarer();
-                          var html = await declarer.getRecords();
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RecordPage(html)));
-                        },)
-                            ],
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          NiceButton(
+                            "View Photos",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => GalleryPage()));
+                            },
+                          ),
+                          NiceButton(
+                            "View Records",
+                            () async {
+                              if (!await _checkCredentials()) {
+                                _showLoginPrompt(
+                                    reason:
+                                        "No credentials are provided. Please login.");
+                                return;
+                              }
+                              var declarer = await _getDeclarer();
+                              var html = await declarer.getRecords();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RecordPage(html)));
+                            },
                           )
+                        ],
+                      )
                     ],
                   ),
                 )
@@ -334,12 +362,11 @@ class NiceButton extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: BorderSide(
-          color: Colors.blueGrey,
-          width: 3.0,
-        )
-      ),
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(
+            color: Colors.blueGrey,
+            width: 3.0,
+          )),
       // button color
       onPressed: onPressed,
     );

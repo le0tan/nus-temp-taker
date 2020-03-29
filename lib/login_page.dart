@@ -18,25 +18,16 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     //TODO: implement build
- 
+
     return Scaffold(
-      
       appBar: AppBar(
         title: Text('Login Page'),
       ),
       //backgroundColor: Colors.transparent,
-      
-      body:    
-      Builder(
+
+      body: Builder(
         builder: (BuildContext context) {
-          return 
-      //     Stack(
-      // children: <Widget>[
-      //   Image.asset("assets/temp_bg.jpeg",
-      //   height: MediaQuery.of(context).size.height,
-      //       width: MediaQuery.of(context).size.width,
-      //       fit: BoxFit.cover),
-            Padding(
+          return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
               child: Form(
@@ -66,7 +57,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: NiceButton("Sumbit", () {
+                      child: NiceButton(
+                        "Submit",
+                        () {
                           if (_formKey.currentState.validate()) {
                             _storage
                                 .write(
@@ -82,16 +75,14 @@ class _LoginPageState extends State<LoginPage> {
                               });
                             });
                           }
-                          
                         },
-                       
                       ),
                     )
                   ],
                 ),
               ),
             ),
-          )
+          );
           //]);
         },
       ),
@@ -115,12 +106,11 @@ class NiceButton extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-        side: BorderSide(
-          color: Colors.blueGrey,
-          width: 3.0,
-        )
-      ),
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(
+            color: Colors.blueGrey,
+            width: 3.0,
+          )),
       // button color
       onPressed: onPressed,
     );
