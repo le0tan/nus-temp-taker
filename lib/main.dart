@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:temp_taker/camera_page.dart';
 import 'package:temp_taker/gallery_page.dart';
@@ -104,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  void _showLoginPrompt({String reason = "No credentials are provided."}) {
+  void _showLoginPrompt({String reason = "You will be directed to login in page. The previous credential will be cleared."}) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -152,22 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                RaisedButton(
-                  child: Text('View photos'),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => GalleryPage()));
-                  },
-                ),
-                RaisedButton(
-                  child: Text('Take photo'),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CameraPage(cameras.first)));
-                  },
-                ),
+                
                 Form(
                   key: _formKey,
                   child: Column(
@@ -217,43 +203,109 @@ class _MyHomePageState extends State<MyHomePage> {
                           Text('Yes')
                         ],
                       ),
-                      RaisedButton(
-                        child: Text('Submit'),
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            var declarer = await getDeclarer();
-                            var res = await declarer.submitTemp(
-                                double.parse(_tempController.text),
-                                freq: _selectedTimeOfTheDay == AM ? 'A' : 'P',
-                                symptom: _selectedSymptom == hasSymptom);
-                            if (res != null) {
-                              _showSuccessPrompt(res);
-                            } else {
-                              _showLoginPrompt(
-                                  reason: 'Failed to submit data. '
-                                      'You may check your connection, restart the app or tap "Login" to reset credentials.');
-                            }
-                          }
-                        },
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            sideButton(
+                              context,
+                              Icons.person,
+                              () async {
+                                await _storage.deleteAll();
+                                _showLoginPrompt();
+                              },
+                            ),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.275,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                Colors.orange,
+                                                Colors.blueGrey,
+                                              ])),
+                                    )),
+                                Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.25,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.25,
+                                    child: new RaisedButton(
+                                      elevation: 0.0,
+                                      color: Colors.white,
+                                      child: new Text(
+                                        "Submit",
+                                        style: TextStyle(
+                                            fontFamily: "Bebas Neue",
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      shape: new CircleBorder(),
+                                      onPressed: () async {
+                                        if (_formKey.currentState.validate()) {
+                                          var declarer = await getDeclarer();
+                                          var res = await declarer.submitTemp(
+                                              double.parse(
+                                                  _tempController.text),
+                                              freq: _selectedTimeOfTheDay == AM
+                                                  ? 'A'
+                                                  : 'P',
+                                              symptom: _selectedSymptom ==
+                                                  hasSymptom);
+                                          if (res != null) {
+                                            _showSuccessPrompt(res);
+                                          } else {
+                                            _showLoginPrompt(
+                                                reason:
+                                                    'Failed to submit data. '
+                                                    'You may check your connection, restart the app or tap "Login" to reset credentials.');
+                                          }
+                                        }
+                                      },
+                                    )),
+                              ],
+                            ),
+                            sideButton(
+                              context,
+                              Icons.camera_enhance,
+                              () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CameraPage(cameras.first)));
+                              },
+                            ),
+                          
+                          ],
+                        ),
                       ),
-                      RaisedButton(
-                        child: Text('Past Records'),
-                        onPressed: () async {
+                      Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              NiceButton("View Photos",  () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => GalleryPage()));
+                  },),
+                       NiceButton("View Records", () async {
                           var declarer = await getDeclarer();
                           var html = await declarer.getRecords();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => RecordPage(html)));
-                        },
-                      ),
-                      RaisedButton(
-                        child: Text('Reset Credentials'),
-                        onPressed: () async {
-                          await _storage.deleteAll();
-                          _showLoginPrompt();
-                        },
-                      )
+                        },)
+                            ],
+                          )
                     ],
                   ),
                 )
@@ -264,4 +316,45 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+var _signinTextStyle =
+    (BuildContext context) => Theme.of(context).textTheme.subhead;
+
+class NiceButton extends StatelessWidget {
+  final String name;
+  final Function onPressed;
+  NiceButton(this.name, this.onPressed);
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      child: Text(
+        name,
+        style: _signinTextStyle(context),
+        textAlign: TextAlign.center,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(
+          color: Colors.blueGrey,
+          width: 3.0,
+        )
+      ),
+      // button color
+      onPressed: onPressed,
+    );
+  }
+}
+
+Widget sideButton(BuildContext context, IconData icon, Function onTap) {
+  return ClipOval(
+    child: Material(
+      color: Colors.orange, // button color
+      child: InkWell(
+        splashColor: Colors.deepOrange, // inkwell color
+        child: SizedBox(width: 50, height: 50, child: Icon(icon)),
+        onTap: onTap,
+      ),
+    ),
+  );
 }
