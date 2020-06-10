@@ -44,7 +44,7 @@ class TempDeclarer {
     return _cookie;
   }
 
-  Future<bool> _submitTemp(double temp, String date, String freq, bool symptom,
+  Future<bool> _submitTemp(double temp, String date, String freq, bool symptom, bool familySymptom,
       String cookie) async {
     var uri = Uri(scheme: 'https', host: 'myaces.nus.edu.sg', path: '/htd/htd');
     var data = {
@@ -52,7 +52,8 @@ class TempDeclarer {
       "tempDeclOn": date,
       "declFrequency": freq,
       "temperature": temp,
-      "symptomsFlag": symptom ? 'Y' : 'N'
+      "symptomsFlag": symptom ? 'Y' : 'N',
+      "familySymptomsFlag" : familySymptom ? 'Y' : 'N'
     };
     var response = await client
         .post(uri.toString(), data, headers: {'Cookie': "JSESSIONID=$cookie;"});
@@ -60,7 +61,7 @@ class TempDeclarer {
   }
 
   Future<Map<String, dynamic>> submitTemp(double temp,
-      {String date, String freq, bool symptom}) async {
+      {String date, String freq, bool symptom, bool familySymptom}) async {
     try {
       if (date == null) {
         var formatter = DateFormat('dd/MM/yyyy');
@@ -72,12 +73,16 @@ class TempDeclarer {
       if (symptom == null) {
         symptom = false;
       }
-      if (await _submitTemp(temp, date, freq, symptom, await _getCookie())) {
+      if (familySymptom == null) {
+        familySymptom = false;
+      }
+      if (await _submitTemp(temp, date, freq, symptom, familySymptom, await _getCookie())) {
         return {
           'tempDeclOn': date,
-          'declFreq': freq,
+          'declFrequency': freq,
           'temperature': temp,
-          'symptom': symptom
+          'symptomsFlag': symptom,
+          "familySymptomsFlag": familySymptom
         };
       } else {
         return null;

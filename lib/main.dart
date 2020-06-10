@@ -48,8 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
   static final int PM = 1;
   static final int noSymptom = 0;
   static final int hasSymptom = 1;
+  static final int noFamilySymptom = 0;
+  static final int hasFamilySymptom = 1;
   var _selectedTimeOfTheDay = AM;
   var _selectedSymptom = noSymptom;
+  var _familySymptom = noFamilySymptom;
   TempDeclarer _declarer;
 
   @override
@@ -83,6 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _setSelectedSymptom(int val) {
     setState(() {
       _selectedSymptom = val;
+    });
+  }
+
+  void _setFamilySymptom(int val) {
+    setState(() {
+      _familySymptom = val;
     });
   }
 
@@ -212,6 +221,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           Text('Yes')
                         ],
                       ),
+                      Row(
+                        children: <Widget>[
+                          Text('Any symptoms in family member?'),
+                          Radio(
+                            value: 0,
+                            groupValue: _familySymptom,
+                            onChanged: (val) => _setFamilySymptom(val),
+                          ),
+                          Text('No'),
+                          Radio(
+                            value: 1,
+                            groupValue: _familySymptom,
+                            onChanged: (val) => _setFamilySymptom(val),
+                          ),
+                          Text('Yes')
+                        ],
+                      ),
                       Container(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -275,7 +301,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   ? 'A'
                                                   : 'P',
                                               symptom: _selectedSymptom ==
-                                                  hasSymptom);
+                                                  hasSymptom,
+                                              familySymptom: _familySymptom ==
+                                                  hasFamilySymptom);
                                           if (res != null) {
                                             _showSuccessPrompt(res);
                                           } else {
